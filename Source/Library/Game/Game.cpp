@@ -22,6 +22,7 @@ namespace library
 
 
 
+
     /*--------------------------------------------------------------------
       Forward declarations
     --------------------------------------------------------------------*/
@@ -123,12 +124,12 @@ namespace library
         {
             g_driverType = driverTypes[driverTypeIndex];
             hr = D3D11CreateDevice(nullptr, g_driverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels,
-                D3D11_SDK_VERSION, g_pd3dDevice.GetAddressOf(), &g_featureLevel, g_pImmediateContext.GetAddressOf());
+                D3D11_SDK_VERSION, &g_pd3dDevice, &g_featureLevel, &g_pImmediateContext);
 
             if (hr == E_INVALIDARG)
             {
                 hr = D3D11CreateDevice(nullptr, g_driverType, nullptr, createDeviceFlags, &featureLevels[1], numFeatureLevels - 1,
-                    D3D11_SDK_VERSION, g_pd3dDevice.GetAddressOf(), &g_featureLevel, g_pImmediateContext.GetAddressOf());
+                    D3D11_SDK_VERSION, &g_pd3dDevice, &g_featureLevel, &g_pImmediateContext);
             }
 
             if (SUCCEEDED(hr))
@@ -144,13 +145,12 @@ namespace library
             if (SUCCEEDED(hr))
             {
                 ComPtr<IDXGIAdapter> adapter;
-                hr = dxgiDevice->GetAdapter(&adapter);
+                hr = dxgiDevice->GetAdapter(adapter.GetAddressOf());
                 if (SUCCEEDED(hr))
                 {
                     hr = adapter->GetParent(IID_PPV_ARGS(&dxgiFactory));
-                    adapter->Release();
+                   
                 }
-                dxgiDevice->Release();
             }
         }
         if (FAILED(hr))
@@ -181,7 +181,6 @@ namespace library
                 hr = g_pSwapChain1.As(&g_pSwapChain);
             }
 
-            dxgiFactory2->Release();
         }
         else
         {
@@ -205,23 +204,22 @@ namespace library
         // Note this tutorial doesn't handle full-screen swapchains so we block the ALT+ENTER shortcut
         dxgiFactory->MakeWindowAssociation(g_hWnd, DXGI_MWA_NO_ALT_ENTER);
 
-        dxgiFactory->Release();
+        
 
         if (FAILED(hr))
             return hr;
 
-        // Create a render target view
         ComPtr <ID3D11Texture2D> pBackBuffer;
         hr = g_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
         if (FAILED(hr))
             return hr;
 
         hr = g_pd3dDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, g_pRenderTargetView.GetAddressOf());
-        pBackBuffer->Release();
+        
         if (FAILED(hr))
             return hr;
 
-        g_pImmediateContext->OMSetRenderTargets(1, &g_pRenderTargetView, nullptr);
+        g_pImmediateContext->OMSetRenderTargets(1, g_pRenderTargetView.GetAddressOf(), nullptr);
 
         // Setup the viewport
         D3D11_VIEWPORT vp;
@@ -237,22 +235,15 @@ namespace library
     }
 
     void Render() {
-        float ClearColor[4] = { 0.0f, 0.125f, 1.6f, 1.0f };
-        g_pImmediateContext->ClearRenderTargetView(g_pRenderTargetView.Get(), ClearColor);
 
-        g_pSwapChain->Present(0, 0);
+        float ClearColor[4] = { 0.0f, 0.125f, 0.6f, 1.0f }; 
+        g_pImmediateContext->ClearRenderTargetView(g_pRenderTargetView.Get(), ClearColor);
+        g_pSwapChain->Present(0,0);
     }
 
     void CleanupDevice()
     {
         if (g_pImmediateContext) g_pImmediateContext->ClearState();
-        if (g_pRenderTargetView) g_pRenderTargetView->Release();
-        if (g_pSwapChain1) g_pSwapChain1->Release();
-        if (g_pSwapChain) g_pSwapChain->Release();
-        if (g_pImmediateContext1) g_pImmediateContext1->Release();
-        if (g_pImmediateContext) g_pImmediateContext->Release();
-        if (g_pd3dDevice1) g_pd3dDevice1->Release();
-        if (g_pd3dDevice) g_pd3dDevice->Release();
     }
 
 }
