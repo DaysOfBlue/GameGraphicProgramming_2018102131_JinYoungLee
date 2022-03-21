@@ -42,7 +42,8 @@ namespace library
       Returns:  LRESULT
                   Integer value that your program returns to Windows
     -----------------------------------------------------------------F-F*/
-    LRESULT CALLBACK WindowProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam){
+    LRESULT CALLBACK WindowProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam)
+    {
         switch (uMsg)
         {
         case WM_DESTROY:
@@ -56,7 +57,8 @@ namespace library
         return 0;
     }
 
-    HRESULT InitWindow(_In_ HINSTANCE hInstance, _In_ INT nCmdShow) {
+    HRESULT InitWindow(_In_ HINSTANCE hInstance, _In_ INT nCmdShow)
+    {
         WNDCLASSEX wcex = {};
         wcex.cbSize = sizeof(WNDCLASSEX);
         wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -90,7 +92,8 @@ namespace library
         return S_OK;
     }
 
-    HRESULT InitDevice() {
+    HRESULT InitDevice() 
+    {
         HRESULT hr = S_OK;
 
         RECT rc;
@@ -141,7 +144,7 @@ namespace library
         ComPtr<IDXGIFactory1> dxgiFactory;
         {
             ComPtr<IDXGIDevice> dxgiDevice;
-            hr = g_pd3dDevice->QueryInterface(IID_PPV_ARGS(&dxgiDevice));
+            hr = g_pd3dDevice.As(&dxgiDevice);
             if (SUCCEEDED(hr))
             {
                 ComPtr<IDXGIAdapter> adapter;
@@ -184,7 +187,7 @@ namespace library
         }
         else
         {
-            // DirectX 11.0 systems
+
             DXGI_SWAP_CHAIN_DESC sd = {};
             sd.BufferCount = 1;
             sd.BufferDesc.Width = width;
@@ -201,7 +204,6 @@ namespace library
             hr = dxgiFactory->CreateSwapChain(g_pd3dDevice.Get(), &sd, g_pSwapChain.GetAddressOf());
         }
 
-        // Note this tutorial doesn't handle full-screen swapchains so we block the ALT+ENTER shortcut
         dxgiFactory->MakeWindowAssociation(g_hWnd, DXGI_MWA_NO_ALT_ENTER);
 
         
@@ -211,6 +213,7 @@ namespace library
 
         ComPtr <ID3D11Texture2D> pBackBuffer;
         hr = g_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
+
         if (FAILED(hr))
             return hr;
 
@@ -221,7 +224,6 @@ namespace library
 
         g_pImmediateContext->OMSetRenderTargets(1, g_pRenderTargetView.GetAddressOf(), nullptr);
 
-        // Setup the viewport
         D3D11_VIEWPORT vp;
         vp.Width = (FLOAT)width;
         vp.Height = (FLOAT)height;
@@ -234,7 +236,8 @@ namespace library
         return S_OK;
     }
 
-    void Render() {
+    void Render()
+    {
 
         float ClearColor[4] = { 0.0f, 0.125f, 0.6f, 1.0f }; 
         g_pImmediateContext->ClearRenderTargetView(g_pRenderTargetView.Get(), ClearColor);
