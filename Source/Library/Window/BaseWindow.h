@@ -128,11 +128,12 @@ namespace library
         Modifies: [m_hInstance, m_hWnd, m_pszWindowName].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
     template<class DerivedType>
-    BaseWindow<DerivedType>::BaseWindow():
-        m_hInstance(nullptr),
-        m_hWnd(nullptr),
-        m_pszWindowName(L"Initialize_WindowName")
-    {}
+    BaseWindow<DerivedType>::BaseWindow() {
+        m_hInstance = nullptr;
+        m_hWnd = nullptr;
+        m_pszWindowName = L"Initialize_WindowName";
+    }
+        
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
         Method:   BaseWindow<DerivedType>::GetWindow()
@@ -190,8 +191,6 @@ namespace library
         _In_opt_ HWND hWndParent,
         _In_opt_ HMENU hMenu) 
     {
-        
-
         m_hInstance = hInstance;
         m_pszWindowName = pszWindowName;
 

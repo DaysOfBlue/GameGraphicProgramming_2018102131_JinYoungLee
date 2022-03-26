@@ -55,7 +55,7 @@ namespace library
 
 	INT Game::Run() 
 	{
-		MSG msg = { 0 };
+		MSG msg = {0};
 
 		while (WM_QUIT != msg.message) {
 			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -78,7 +78,6 @@ namespace library
 	  Returns:  PCWSTR
 				  Name of the game
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-
 	PCWSTR Game::GetGameName() const 
 	{
 		return m_pszGameName;

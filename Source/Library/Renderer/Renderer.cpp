@@ -67,12 +67,12 @@ namespace library
         {
             m_driverType = driverTypes[driverTypeIndex];
             hr = D3D11CreateDevice(nullptr, m_driverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels,
-                D3D11_SDK_VERSION, &m_d3dDevice, &m_featureLevel, &m_immediateContext);
+                D3D11_SDK_VERSION, m_d3dDevice.GetAddressOf(), &m_featureLevel, m_immediateContext.GetAddressOf());
 
             if (hr == E_INVALIDARG)
             {
                 hr = D3D11CreateDevice(nullptr, m_driverType, nullptr, createDeviceFlags, &featureLevels[1], numFeatureLevels - 1,
-                    D3D11_SDK_VERSION, &m_d3dDevice, &m_featureLevel, &m_immediateContext);
+                    D3D11_SDK_VERSION, m_d3dDevice.GetAddressOf(), &m_featureLevel, m_immediateContext.GetAddressOf());
             }
 
             if (SUCCEEDED(hr))
@@ -84,7 +84,7 @@ namespace library
         ComPtr<IDXGIFactory1> dxgiFactory;
         {
             ComPtr<IDXGIDevice> dxgiDevice;
-            hr = m_d3dDevice->QueryInterface(IID_PPV_ARGS(&dxgiDevice));
+            hr = m_d3dDevice.As(&dxgiDevice);
             if (SUCCEEDED(hr))
             {
                 ComPtr<IDXGIAdapter> adapter;
