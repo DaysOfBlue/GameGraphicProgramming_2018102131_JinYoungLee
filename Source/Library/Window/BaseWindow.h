@@ -194,10 +194,26 @@ namespace library
         m_hInstance = hInstance;
         m_pszWindowName = pszWindowName;
 
+        WNDCLASSEX wcex = {};
+        wcex.cbSize = sizeof(WNDCLASSEX);
+        wcex.style = CS_HREDRAW | CS_VREDRAW;
+        wcex.lpfnWndProc = BaseWindow<DerivedType>::WindowProc;
+        wcex.cbClsExtra = 0;
+        wcex.cbWndExtra = 0;
+        wcex.hInstance = hInstance;
+        wcex.hIcon = LoadIcon(hInstance, IDI_APPLICATION);
+        wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+        wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+        wcex.lpszMenuName = nullptr;
+        wcex.lpszClassName = L"Game Graphics Programming Lab 02: Object Oriented Design";
+        wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);
+
+        if (!RegisterClassEx(&wcex))
+            return E_FAIL;
         m_hWnd = CreateWindowEx(0, GetWindowClassName(), pszWindowName, dwStyle, x, y, nWidth, nHeight,hWndParent,hMenu, hInstance, this);
 
         if (m_hWnd == NULL)
-            return 0;
+            return E_FAIL;
 
         ShowWindow(m_hWnd, nCmdShow);
 

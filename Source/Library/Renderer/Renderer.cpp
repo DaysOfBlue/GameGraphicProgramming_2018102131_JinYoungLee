@@ -109,14 +109,16 @@ namespace library
                 (void)m_immediateContext.As(&m_immediateContext1);
             }
 
-            DXGI_SWAP_CHAIN_DESC1 sd = {};
-            sd.Width = width;
-            sd.Height = height;
-            sd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-            sd.SampleDesc.Count = 1;
-            sd.SampleDesc.Quality = 0;
-            sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-            sd.BufferCount = 1;
+            DXGI_SWAP_CHAIN_DESC1 sd = {
+            
+                .Width = width,
+                .Height = height,
+                .Format = DXGI_FORMAT_R8G8B8A8_UNORM,
+                .SampleDesc = {.Count = 1, .Quality = 0},
+                .BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
+                .BufferCount = 1
+            };
+            
 
             hr = dxgiFactory2->CreateSwapChainForHwnd(m_d3dDevice.Get(), hWnd, &sd, nullptr, nullptr, m_swapChain1.GetAddressOf());
             if (SUCCEEDED(hr))
@@ -128,18 +130,27 @@ namespace library
         else
         {
 
-            DXGI_SWAP_CHAIN_DESC sd = {};
-            sd.BufferCount = 1;
-            sd.BufferDesc.Width = width;
-            sd.BufferDesc.Height = height;
-            sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-            sd.BufferDesc.RefreshRate.Numerator = 60;
-            sd.BufferDesc.RefreshRate.Denominator = 1;
-            sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-            sd.OutputWindow = hWnd;
-            sd.SampleDesc.Count = 1;
-            sd.SampleDesc.Quality = 0;
-            sd.Windowed = TRUE;
+            DXGI_SWAP_CHAIN_DESC sd = 
+            {
+                .BufferDesc = {
+                    .Width = width,
+                    .Height = height,
+                    .RefreshRate = {
+                        .Numerator = 60,
+                        .Denominator = 1},
+                    .Format = DXGI_FORMAT_R8G8B8A8_UNORM,                   
+                },
+                .SampleDesc = {
+                    .Count = 1,
+                    .Quality = 0
+
+                },
+                .BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
+                .BufferCount = 1,
+                .OutputWindow = hWnd,
+                .Windowed = TRUE
+            };
+            
 
             hr = dxgiFactory->CreateSwapChain(m_d3dDevice.Get(), &sd, m_swapChain.GetAddressOf());
         }
