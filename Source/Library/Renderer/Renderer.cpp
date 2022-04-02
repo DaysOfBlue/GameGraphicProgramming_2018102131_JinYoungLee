@@ -329,11 +329,11 @@ namespace library
             NULL, NULL
         };
 
-        ID3DBlob* shaderBlob = nullptr;
-        ID3DBlob* errorBlob = nullptr;
+        ComPtr<ID3DBlob> shaderBlob;
+        ComPtr<ID3DBlob> errorBlob;
         HRESULT hr = D3DCompileFromFile(pszFileName, defines, D3D_COMPILE_STANDARD_FILE_INCLUDE,
             pszEntryPoint, szShaderModel,
-            flags, 0, &shaderBlob, &errorBlob);
+            flags, 0, shaderBlob.GetAddressOf(), errorBlob.GetAddressOf());
         if (FAILED(hr))
         {
             if (errorBlob)
@@ -344,7 +344,7 @@ namespace library
             return hr;
         }
 
-        *ppBlobOut = shaderBlob;
+        *ppBlobOut = shaderBlob.Get();
 
         return hr;
     }
