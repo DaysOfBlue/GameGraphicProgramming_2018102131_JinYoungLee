@@ -12,20 +12,15 @@
 #pragma once
 
 #include "Common.h"
-#include <vector>
+
+#include "Renderer/DataTypes.h"
+#include "Renderer/Renderable.h"
+#include "Shader/PixelShader.h"
+#include "Shader/VertexShader.h"
 #include "Window/MainWindow.h"
 
 namespace library
 {
-    /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
-      Struct:    SimpleVertex
-      Summary:  Simple vertex structure containing a single field of the
-                type XMFLOAT3
-    C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
-    struct SimpleVertex
-    {
-        XMFLOAT3 Postion;
-    };
 
     /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
       Class:    Renderer
@@ -53,11 +48,20 @@ namespace library
         ~Renderer() = default;
 
         HRESULT Initialize(_In_ HWND hWnd);
+        HRESULT AddRenderable(_In_ PCWSTR pszRenderableName, _In_ const std::shared_ptr<Renderable>& renderable);
+        HRESULT AddVertexShader(_In_ PCWSTR pszVertexShaderName, _In_ const std::shared_ptr<VertexShader>& vertexShader);
+        HRESULT AddPixelShader(_In_ PCWSTR pszPixelShaderName, _In_ const std::shared_ptr<PixelShader>& pixelShader);
+
+        void Update(_In_ FLOAT deltaTime);
         void Render();
 
-    private:
-        HRESULT compileShaderFromFile(_In_ PCWSTR pszFileName, _In_ PCSTR pszEntryPoint, _In_ PCSTR szShaderModel, _Outptr_ ID3DBlob** ppBlobOut);
+        HRESULT SetVertexShaderOfRenderable(_In_ PCWSTR pszRenderableName, _In_ PCWSTR pszVertexShaderName);
+        HRESULT SetPixelShaderOfRenderable(_In_ PCWSTR pszRenderableName, _In_ PCWSTR pszPixelShaderName);
 
+        D3D_DRIVER_TYPE GetDriverType() const;
+
+    private:
+        
         D3D_DRIVER_TYPE m_driverType;
         D3D_FEATURE_LEVEL m_featureLevel;
         ComPtr<ID3D11Device> m_d3dDevice;
@@ -67,9 +71,13 @@ namespace library
         ComPtr<IDXGISwapChain> m_swapChain;
         ComPtr<IDXGISwapChain1> m_swapChain1;
         ComPtr<ID3D11RenderTargetView> m_renderTargetView;
-        ComPtr<ID3D11VertexShader> m_vertexShader;
-        ComPtr<ID3D11PixelShader> m_pixelShader;
-        ComPtr<ID3D11InputLayout> m_vertexLayout;
-        ComPtr<ID3D11Buffer> m_vertexBuffer;
+        ComPtr<ID3D11Texture2D> m_depthStencil;
+        ComPtr<ID3D11DepthStencilView> m_depthStencilView;
+        XMMATRIX m_view;
+        XMMATRIX m_projection;
+
+        std::unordered_map<PCWSTR, std::shared_ptr<Renderable>> m_renderables;
+        std::unordered_map<PCWSTR, std::shared_ptr<VertexShader>> m_vertexShaders;
+        std::unordered_map<PCWSTR, std::shared_ptr<PixelShader>> m_pixelShaders;
     };
 }

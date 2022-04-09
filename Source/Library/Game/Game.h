@@ -44,6 +44,8 @@ namespace library
         INT Run();
 
         PCWSTR GetGameName() const;
+        std::unique_ptr<MainWindow>& GetWindow();
+        std::unique_ptr<Renderer>& GetRenderer();
     private:
         PCWSTR m_pszGameName;
         std::unique_ptr<MainWindow> m_mainWindow;

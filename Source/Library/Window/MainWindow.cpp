@@ -23,14 +23,8 @@ namespace library
         RECT rc = { 0, 0, 800, 600 };
         AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
         DWORD dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU;
-        INT x = CW_USEDEFAULT;
-        INT y = CW_USEDEFAULT;
-        INT nWidth = rc.right - rc.left;
-        INT nHeight = rc.bottom - rc.top;
-        HWND hWndParent = nullptr;
-        HMENU hMenu = nullptr;
 
-        HRESULT hr = BaseWindow::initialize(hInstance, nCmdShow, pszWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, hMenu);
+        HRESULT hr = BaseWindow::initialize(hInstance, nCmdShow, pszWindowName, dwStyle);
 
         if (FAILED(hr))
             return hr;

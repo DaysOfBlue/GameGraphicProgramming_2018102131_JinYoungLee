@@ -194,6 +194,9 @@ namespace library
         m_hInstance = hInstance;
         m_pszWindowName = pszWindowName;
 
+             
+        
+
         WNDCLASSEX wcex = {};
         wcex.cbSize = sizeof(WNDCLASSEX);
         wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -205,7 +208,7 @@ namespace library
         wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
         wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
         wcex.lpszMenuName = nullptr;
-        wcex.lpszClassName = L"Game Graphics Programming Lab 02: Object Oriented Design";
+        wcex.lpszClassName = GetWindowClassName();
         wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);
 
         if (!RegisterClassEx(&wcex))
