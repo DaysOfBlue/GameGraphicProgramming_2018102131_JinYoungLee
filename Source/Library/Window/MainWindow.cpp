@@ -127,7 +127,7 @@ namespace library
                 }
             }
 
-            return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
+            return 0;
 
         case WM_KEYDOWN:
 

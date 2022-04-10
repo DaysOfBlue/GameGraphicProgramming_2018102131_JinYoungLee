@@ -31,11 +31,11 @@ namespace library
         m_cameraUp(DEFAULT_UP),
 
         m_eye(position),
-        m_at (XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)),
-        m_up(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)),
+        m_at (),
+        m_up(),
 
         m_rotation(),
-        m_view(XMMatrixLookAtLH(m_eye, m_at, m_up))
+        m_view()
     {}
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
@@ -154,7 +154,7 @@ namespace library
         FLOAT yawRotation = mouseRelativeMovement.X;
         FLOAT pitchRotation = mouseRelativeMovement.Y;
 
-        WCHAR szDebugMessage[64];  // 배열의 크기는 메시지의 길이에 따라 조정하시면 됩니다
+
         if (yawRotation != 0 || pitchRotation != 0) 
         {
             XMVECTOR xyRotation = XMVectorSet(yawRotation, pitchRotation, 0.0f, 0.0f);
