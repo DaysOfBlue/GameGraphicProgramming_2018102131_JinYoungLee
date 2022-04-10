@@ -59,6 +59,7 @@ namespace library
 		LARGE_INTEGER Frequency;
 		FLOAT ElapsedSeconds;
 		MSG msg = {0};
+
 		QueryPerformanceCounter(&StartingTime);
 
 		while (WM_QUIT != msg.message) {
@@ -76,8 +77,13 @@ namespace library
 				QueryPerformanceCounter(&EndingTime);
 				ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
 				ElapsedSeconds = ElapsedMicroseconds.QuadPart / (FLOAT)Frequency.QuadPart;
+				// HandleInput
+				m_renderer->HandleInput(m_mainWindow->GetDirections(), m_mainWindow->GetMouseRelativeMovement(),ElapsedSeconds);
+				m_mainWindow->ResetMouseMovement();
+				//Update
 				m_renderer->Update(ElapsedSeconds);
 				QueryPerformanceCounter(&StartingTime);
+				//Draw
 				m_renderer -> Render();
 				
 			}

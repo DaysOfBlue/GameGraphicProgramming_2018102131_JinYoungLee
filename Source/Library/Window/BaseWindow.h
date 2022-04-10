@@ -6,7 +6,15 @@
 
   Classes: BaseWindow<DerivedType>
 
-  © 2022 Kyung Hee University
+/*+===================================================================
+  File:      BASEWINDOW.H
+
+  Summary:   BaseWindow header file contains declarations of the
+             base class of all windows used in the library.
+
+  Classes: BaseWindow<DerivedType>
+
+  � 2022 Kyung Hee University
 ===================================================================+*/
 #pragma once
 
@@ -24,17 +32,17 @@ namespace library
                 Initialize
                     Purely virtual function that initializes window
                 GetWindowClassName
-                    Purely virtual function that returns the name of 
+                    Purely virtual function that returns the name of
                     the window class
                 HandleMessage
-                    Purely virtual function that that handles the 
+                    Purely virtual function that that handles the
                     messages
                 GetWindow
-                    Getter for the handle to the window
+                  Getter for the handle to the window
                 BaseWindow
-                    Constructor.
+                  Constructor.
                 ~BaseWindow
-                    Destructor.
+                  Destructor.
     C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
     template <class DerivedType>
     class BaseWindow
@@ -193,9 +201,6 @@ namespace library
     {
         m_hInstance = hInstance;
         m_pszWindowName = pszWindowName;
-
-             
-        
 
         WNDCLASSEX wcex = {};
         wcex.cbSize = sizeof(WNDCLASSEX);

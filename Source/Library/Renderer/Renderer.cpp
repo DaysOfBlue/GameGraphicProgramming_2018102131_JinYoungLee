@@ -13,6 +13,17 @@ namespace library
     Renderer::Renderer() :
         m_driverType(D3D_DRIVER_TYPE_NULL),
         m_featureLevel(D3D_FEATURE_LEVEL_11_0),
+        m_d3dDevice(),
+        m_d3dDevice1(),
+        m_immediateContext(),
+        m_immediateContext1(),
+        m_swapChain(),
+        m_swapChain1(),
+        m_renderTargetView(),
+        m_depthStencil(),
+        m_depthStencilView(),
+        m_camera(XMVectorSet(0.0f, 1.0f, -5.0f, 0.0f)),
+        m_projection(),
         m_renderables(),
         m_vertexShaders(),
         m_pixelShaders()
@@ -221,11 +232,7 @@ namespace library
         vp.TopLeftY = 0;
         m_immediateContext->RSSetViewports(1, &vp);
         
-        XMVECTOR eye = XMVectorSet(0.0f, 1.0f, -5.0f, 0.0f);
-        XMVECTOR at = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-        XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-        m_view = XMMatrixLookAtLH(eye, at, up);
+        
         m_projection = XMMatrixPerspectiveFovLH(XM_PIDIV2, width / (FLOAT)height, 0.01f, 100.0f);
 
 
@@ -322,6 +329,23 @@ namespace library
         }
     }
 
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderer::HandleInput
+
+      Summary:  Add the pixel shader into the renderer and initialize it
+
+      Args:     const DirectionsInput& directions
+                  Data structure containing keyboard input data
+                const MouseRelativeMovement& mouseRelativeMovement
+                  Data structure containing mouse relative input data
+
+      Modifies: [m_camera].
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    void Renderer::HandleInput(_In_ const DirectionsInput& directions, _In_ const MouseRelativeMovement& mouseRelativeMovement, _In_ FLOAT deltaTime)
+    {
+        m_camera.HandleInput(directions, mouseRelativeMovement, deltaTime);
+    }
+
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Renderer::Update
@@ -330,13 +354,15 @@ namespace library
                   Time difference of a frame
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
     
+    
     void Renderer::Update(_In_ FLOAT deltaTime) {
 
         for (auto i : m_renderables) 
         {
             i.second->Update(deltaTime);
-        }
 
+        }
+        m_camera.Update(deltaTime);
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
@@ -358,11 +384,14 @@ namespace library
             m_immediateContext->IASetIndexBuffer(i.second->GetIndexBuffer().Get(),DXGI_FORMAT_R16_UINT ,0);
             m_immediateContext->IASetInputLayout(i.second->GetVertexLayout().Get());
 
-            ConstantBuffer cb1;
-            cb1.World = XMMatrixTranspose(i.second->GetWorldMatrix());
-            cb1.View = XMMatrixTranspose(m_view);
-            cb1.Projection = XMMatrixTranspose(m_projection);
+            ConstantBuffer cb1 = {
 
+                .World = XMMatrixTranspose(i.second->GetWorldMatrix()),
+                .View = XMMatrixTranspose(m_camera.GetView()),
+                .Projection = XMMatrixTranspose(m_projection)
+
+            };
+            
             m_immediateContext->UpdateSubresource(i.second->GetConstantBuffer().Get(), 0, nullptr, &cb1, 0, 0);
             m_immediateContext->VSSetShader(i.second->GetVertexShader().Get(), nullptr, 0); 
             m_immediateContext->VSSetConstantBuffers(0, 1, i.second->GetConstantBuffer().GetAddressOf()); 

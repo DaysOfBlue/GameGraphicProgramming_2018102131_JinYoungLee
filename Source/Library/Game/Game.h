@@ -1,10 +1,13 @@
 /*+===================================================================
   File:      GAME.H
-  Summary:   Game header file that contains declarations of functinos
+
+  Summary:   Game header file contains declarations of functions
              used for the lab samples of Game Graphics Programming
              course.
-  Classes: Game
-  © 2022 Kyung Hee University
+
+  Classes:  Game
+
+  � 2022 Kyung Hee University
 ===================================================================+*/
 #pragma once
 
@@ -17,13 +20,21 @@ namespace library
 {
     /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
       Class:    Game
+
       Summary:  Main game engine class
+
       Methods:  Initialize
                   Initializes the components of the game
                 Run
                   Runs the game loop
                 GetGameName
                   Returns the name of the game
+                GetWindow
+                  Returns the reference to the unique pointer to the
+                  main window
+                GetRenderer
+                  Returns the reference to the unique pointer to the
+                  renderer
                 Game
                   Constructor.
                 ~Game
@@ -40,7 +51,6 @@ namespace library
         ~Game() = default;
 
         HRESULT Initialize(_In_ HINSTANCE hInstance, _In_ INT nCmdShow);
-
         INT Run();
 
         PCWSTR GetGameName() const;
