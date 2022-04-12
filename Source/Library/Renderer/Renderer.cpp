@@ -191,18 +191,24 @@ namespace library
 
         // Create a Depth-Stencil Resource
         ComPtr<ID3D11Texture2D> m_depthStencil(nullptr);
-        D3D11_TEXTURE2D_DESC descDepth;
-        descDepth.Width = width;
-        descDepth.Height = height;
-        descDepth.MipLevels = 1;
-        descDepth.ArraySize = 1;
-        descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        descDepth.SampleDesc.Count = 1;
-        descDepth.SampleDesc.Quality = 0;
-        descDepth.Usage = D3D11_USAGE_DEFAULT;
-        descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-        descDepth.CPUAccessFlags = 0;
-        descDepth.MiscFlags = 0;
+        D3D11_TEXTURE2D_DESC descDepth = 
+        {
+            .Width = width,
+            .Height = height,
+            .MipLevels = 1,
+            .ArraySize = 1,
+            .Format = DXGI_FORMAT_D24_UNORM_S8_UINT,
+            .SampleDesc = 
+            {
+                .Count = 1,
+                .Quality = 0
+            },
+            .Usage = D3D11_USAGE_DEFAULT,
+            .BindFlags = D3D11_BIND_DEPTH_STENCIL,
+            .CPUAccessFlags = 0,
+            .MiscFlags = 0
+        };
+        
 
         hr = m_d3dDevice->CreateTexture2D(&descDepth, NULL, &m_depthStencil);
         if (FAILED(hr))
@@ -223,15 +229,18 @@ namespace library
         m_immediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         // Set up ViewPort
-        D3D11_VIEWPORT vp;
-        vp.Width = (FLOAT)width;
-        vp.Height = (FLOAT)height;
-        vp.MinDepth = 0.0f;
-        vp.MaxDepth = 1.0f;
-        vp.TopLeftX = 0;
-        vp.TopLeftY = 0;
-        m_immediateContext->RSSetViewports(1, &vp);
+        D3D11_VIEWPORT vp = 
+        {
+            .TopLeftX = 0,
+            .TopLeftY = 0,
+            .Width = (FLOAT)width,
+            .Height = (FLOAT)height,
+            .MinDepth = 0.0f,
+            .MaxDepth = 1.0f,
+            
+        };
         
+        m_immediateContext->RSSetViewports(1, &vp);
         
         m_projection = XMMatrixPerspectiveFovLH(XM_PIDIV2, width / (FLOAT)height, 0.01f, 100.0f);
 

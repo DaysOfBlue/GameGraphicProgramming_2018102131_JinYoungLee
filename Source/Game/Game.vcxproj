@@ -12,12 +12,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cube\BaseCube.cpp" />
+    <ClCompile Include="Cube\CustomCube.cpp" />
     <ClCompile Include="Cube\MyCube.cpp" />
     <ClCompile Include="Cube\OrbitCube.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cube\BaseCube.h" />
+    <ClInclude Include="Cube\CustomCube.h" />
     <ClInclude Include="Cube\MyCube.h" />
     <ClInclude Include="Cube\OrbitCube.h" />
   </ItemGroup>

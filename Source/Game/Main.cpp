@@ -14,6 +14,7 @@
 #include "Cube/BaseCube.h"
 #include "Cube/MyCube.h"
 #include "Cube/OrbitCube.h"
+#include "Cube/CustomCube.h"
 
 #include "Game/Game.h"
 
@@ -81,6 +82,16 @@ INT WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         return 0;
     }
 
+    std::shared_ptr<CustomCube> customCube = std::make_shared<CustomCube>();
+    game->GetRenderer()->AddRenderable(L"CustomCube", customCube);
+    if (FAILED(game->GetRenderer()->SetVertexShaderOfRenderable(L"CustomCube", L"MainShader")))
+    {
+        return 0;
+    }
+    if (FAILED(game->GetRenderer()->SetPixelShaderOfRenderable(L"CustomCube", L"MainShader")))
+    {
+        return 0;
+    }
     
 
     if (FAILED(game->Initialize(hInstance, nCmdShow)))

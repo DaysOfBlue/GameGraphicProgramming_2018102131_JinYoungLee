@@ -53,8 +53,10 @@ namespace library
         p2.x = rc.right;
         p2.y = rc.bottom;
 
-        if (!ClientToScreen(m_hWnd, &p1)) return E_FAIL;
-        if (!ClientToScreen(m_hWnd, &p2)) return E_FAIL;
+        if (!ClientToScreen(m_hWnd, &p1)) 
+            return E_FAIL;
+        if (!ClientToScreen(m_hWnd, &p2)) 
+            return E_FAIL;
 
         rc.left = p1.x;
         rc.top = p1.y;
