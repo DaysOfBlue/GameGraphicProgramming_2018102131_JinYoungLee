@@ -12,9 +12,11 @@
 #include <memory>
 
 #include "Cube/BaseCube.h"
-#include "Cube/MyCube.h"
-#include "Cube/OrbitCube.h"
+#include "Cube/Cube.h"
+//#include "Cube/MyCube.h"
+//#include "Cube/OrbitCube.h"
 #include "Cube/CustomCube.h"
+
 
 #include "Game/Game.h"
 
@@ -45,7 +47,7 @@ INT WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    std::unique_ptr<library::Game> game = std::make_unique<library::Game>(L"Game Graphics Programming Lab 04: 3D Spaces and Transformations");
+    std::unique_ptr<library::Game> game = std::make_unique<library::Game>(L"Game Graphics Programming Lab 05: Texture");
 
     std::shared_ptr<library::VertexShader> vertexShader = std::make_shared<library::VertexShader>(L"Shaders/Shaders.fxh", "VS", "vs_5_0");
     if (FAILED(game->GetRenderer()->AddVertexShader(L"MainShader", vertexShader)))
@@ -60,7 +62,7 @@ INT WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     }
 
     
-    std::shared_ptr<MyCube> centerCube = std::make_shared<MyCube>();
+    std::shared_ptr<Cube> centerCube = std::make_shared<Cube>("seafloor.dds");
     game->GetRenderer()->AddRenderable(L"centerCube", centerCube);
     if (FAILED(game->GetRenderer()->SetVertexShaderOfRenderable(L"centerCube", L"MainShader")))
     {
@@ -71,28 +73,16 @@ INT WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         return 0;
     }
 
-    std::shared_ptr<OrbitCube> orbitCube = std::make_shared<OrbitCube>();
-    game->GetRenderer()->AddRenderable(L"orbitCube", orbitCube);
-    if (FAILED(game->GetRenderer()->SetVertexShaderOfRenderable(L"orbitCube", L"MainShader")))
+    std::shared_ptr<CustomCube> customCube = std::make_shared<CustomCube>("tile.dds");
+    game->GetRenderer()->AddRenderable(L"customCube", customCube);
+    if (FAILED(game->GetRenderer()->SetVertexShaderOfRenderable(L"customCube", L"MainShader")))
     {
         return 0;
     }
-    if (FAILED(game->GetRenderer()->SetPixelShaderOfRenderable(L"orbitCube", L"MainShader")))
+    if (FAILED(game->GetRenderer()->SetPixelShaderOfRenderable(L"customCube", L"MainShader")))
     {
         return 0;
     }
-
-    std::shared_ptr<CustomCube> customCube = std::make_shared<CustomCube>();
-    game->GetRenderer()->AddRenderable(L"CustomCube", customCube);
-    if (FAILED(game->GetRenderer()->SetVertexShaderOfRenderable(L"CustomCube", L"MainShader")))
-    {
-        return 0;
-    }
-    if (FAILED(game->GetRenderer()->SetPixelShaderOfRenderable(L"CustomCube", L"MainShader")))
-    {
-        return 0;
-    }
-    
 
     if (FAILED(game->Initialize(hInstance, nCmdShow)))
     {

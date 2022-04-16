@@ -39,6 +39,9 @@
     <ClCompile Include="Cube\CustomCube.cpp">
       <Filter>Source Files\Cube</Filter>
     </ClCompile>
+    <ClCompile Include="Cube\Cube.cpp">
+      <Filter>Source Files\Cube</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\PS.hlsl">
@@ -59,6 +62,9 @@
       <Filter>Header Files\Cube</Filter>
     </ClInclude>
     <ClInclude Include="Cube\CustomCube.h">
+      <Filter>Header Files\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube\Cube.h">
       <Filter>Header Files\Cube</Filter>
     </ClInclude>
   </ItemGroup>

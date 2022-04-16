@@ -1,7 +1,28 @@
 #include "Renderer/Renderable.h"
-
+#include "Texture\DDSTextureLoader.h"
 namespace library
 {
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::Renderable
+      Summary:  Constructor
+      Args:     const std::filesystem::path& textureFilePath
+                  Path to the texture to use
+      Modifies: [m_vertexBuffer, m_indexBuffer, m_constantBuffer,
+                 m_textureRV, m_samplerLinear, m_vertexShader,
+                 m_pixelShader, m_textureFilePath, m_world].
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    
+    Renderable::Renderable(_In_ const std::filesystem::path& textureFilePath):
+        m_textureFilePath(textureFilePath),
+        m_vertexBuffer(),
+        m_indexBuffer(),
+        m_constantBuffer(),
+        m_textureRV(),
+        m_samplerLinear(),
+        m_vertexShader(),
+        m_pixelShader(),
+        m_world()
+    {}
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Renderable::initialize
 
@@ -20,47 +41,94 @@ namespace library
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
     HRESULT Renderable::initialize(_In_ ID3D11Device* pDevice, _In_ ID3D11DeviceContext* pImmediateContext) 
     {
-        D3D11_BUFFER_DESC bd;
-        ZeroMemory(&bd, sizeof(bd));
-        bd.Usage = D3D11_USAGE_DEFAULT;
-        bd.ByteWidth = sizeof(SimpleVertex) * GetNumVertices(); 
-        bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-        bd.CPUAccessFlags = 0;
-        bd.MiscFlags = 0;
+        // Create the vertex buffer
+        D3D11_BUFFER_DESC vBufferDesc = {
+            .ByteWidth = static_cast<UINT>(sizeof(SimpleVertex)) * GetNumVertices(),
+            .Usage = D3D11_USAGE_DEFAULT,
+            .BindFlags = D3D11_BIND_VERTEX_BUFFER,
+            .CPUAccessFlags = 0,
+            .MiscFlags = 0
+        };
 
-        
-        D3D11_SUBRESOURCE_DATA InitData =
-        {
+        D3D11_SUBRESOURCE_DATA vInitData = {
             .pSysMem = getVertices(),
-            .SysMemPitch = 0, 
+            .SysMemPitch = 0,
             .SysMemSlicePitch = 0
         };
 
-        HRESULT hr = pDevice->CreateBuffer(&bd, &InitData, m_vertexBuffer.GetAddressOf());
+        HRESULT hr = pDevice->CreateBuffer(&vBufferDesc, &vInitData, m_vertexBuffer.GetAddressOf());
         if (FAILED(hr))
+        {
             return hr;
+        }
 
-        ZeroMemory(&bd, sizeof(bd));
-        bd.Usage = D3D11_USAGE_DEFAULT;
-        bd.ByteWidth = sizeof(WORD) * GetNumIndices();        
-        bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-        bd.CPUAccessFlags = 0;
-        bd.MiscFlags = 0;
+        // Create the index buffer
+        D3D11_BUFFER_DESC iBufferDesc = {
+            .ByteWidth = static_cast<UINT>(sizeof(WORD)) * GetNumIndices(),
+            .Usage = D3D11_USAGE_DEFAULT,
+            .BindFlags = D3D11_BIND_INDEX_BUFFER,
+            .CPUAccessFlags = 0,
+            .MiscFlags = 0
+        };
 
-        InitData.pSysMem = getIndices();
-        hr = pDevice->CreateBuffer(&bd, &InitData, m_indexBuffer.GetAddressOf());
+        D3D11_SUBRESOURCE_DATA iInitData = {
+            .pSysMem = getIndices(),
+            .SysMemPitch = 0,
+            .SysMemSlicePitch = 0
+        };
+
+        hr = pDevice->CreateBuffer(&iBufferDesc, &iInitData, m_indexBuffer.GetAddressOf());
+        if (FAILED(hr)) 
+        {
+            return hr;
+        }
+            
+
+        // Create the constant buffer
+        D3D11_BUFFER_DESC cBufferDesc = {
+            .ByteWidth = sizeof(CBChangesEveryFrame),
+            .Usage = D3D11_USAGE_DEFAULT,
+            .BindFlags = D3D11_BIND_CONSTANT_BUFFER,
+            .CPUAccessFlags = 0,
+            .MiscFlags = 0,
+            .StructureByteStride = 0
+        };
+
+        CBChangesEveryFrame cb = {};
+
+        D3D11_SUBRESOURCE_DATA cInitData = {
+            .pSysMem = &cb,
+            .SysMemPitch = 0,
+            .SysMemSlicePitch = 0
+        };
+
+        hr = pDevice->CreateBuffer(&cBufferDesc, &cInitData, &m_constantBuffer);
         if (FAILED(hr))
+        {
             return hr;
+        }
 
-        ZeroMemory(&bd, sizeof(bd));
-        bd.Usage = D3D11_USAGE_DEFAULT;
-        bd.ByteWidth = sizeof(ConstantBuffer);
-        bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        bd.CPUAccessFlags = 0;
-
-        hr = pDevice->CreateBuffer(&bd, nullptr, m_constantBuffer.GetAddressOf());
+        hr = CreateDDSTextureFromFile(pDevice, m_textureFilePath.filename().wstring().c_str(), nullptr, &m_textureRV);
         if (FAILED(hr))
+        {
             return hr;
+        }
+
+        D3D11_SAMPLER_DESC sampDesc = {
+            .Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR,
+            .AddressU = D3D11_TEXTURE_ADDRESS_WRAP,
+            .AddressV = D3D11_TEXTURE_ADDRESS_WRAP,
+            .AddressW = D3D11_TEXTURE_ADDRESS_WRAP,
+            .ComparisonFunc = D3D11_COMPARISON_NEVER,
+            .MinLOD = 0,
+            .MaxLOD = D3D11_FLOAT32_MAX
+        };
+
+        hr = pDevice->CreateSamplerState(&sampDesc, &m_samplerLinear);
+        if (FAILED(hr))
+        {
+            return hr;
+        }
         
         m_world = XMMatrixIdentity();
 
@@ -192,5 +260,27 @@ namespace library
     const XMMATRIX& Renderable::GetWorldMatrix() const 
     {
         return m_world;
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::GetTextureResourceView
+      Summary:  Returns the texture resource view
+      Returns:  ComPtr<ID3D11ShaderResourceView>&
+                  The texture resource view
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    ComPtr<ID3D11ShaderResourceView>& Renderable::GetTextureResourceView()
+    {
+        return m_textureRV;
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderable::GetSamplerState
+      Summary:  Returns the sampler state
+      Returns:  ComPtr<ID3D11SamplerState>&
+                  The sampler state
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    ComPtr<ID3D11SamplerState>& Renderable::GetSamplerState()
+    {
+        return m_samplerLinear;
     }
 }

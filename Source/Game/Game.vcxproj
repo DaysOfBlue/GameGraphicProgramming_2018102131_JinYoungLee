@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cube\BaseCube.cpp" />
+    <ClCompile Include="Cube\Cube.cpp" />
     <ClCompile Include="Cube\CustomCube.cpp" />
     <ClCompile Include="Cube\MyCube.cpp" />
     <ClCompile Include="Cube\OrbitCube.cpp" />
@@ -19,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cube\BaseCube.h" />
+    <ClInclude Include="Cube\Cube.h" />
     <ClInclude Include="Cube\CustomCube.h" />
     <ClInclude Include="Cube\MyCube.h" />
     <ClInclude Include="Cube\OrbitCube.h" />
