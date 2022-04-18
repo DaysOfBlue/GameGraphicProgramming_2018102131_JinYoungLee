@@ -6,11 +6,14 @@
 class OrbitCube : public BaseCube {
 
 public:
-	OrbitCube() = default;
-	~OrbitCube() = default;
+    OrbitCube(const std::filesystem::path& textureFilePath);
+    OrbitCube(const OrbitCube& other) = delete;
+    OrbitCube(OrbitCube&& other) = delete;
+    OrbitCube& operator=(const OrbitCube& other) = delete;
+    OrbitCube& operator=(OrbitCube&& other) = delete;
+    ~OrbitCube() = default;
 
-	void Update(FLOAT deltaTime);
-	virtual HRESULT Initialize(_In_ ID3D11Device* pDevice, _In_ ID3D11DeviceContext* pImmediateContext) override;
+    virtual void Update(_In_ FLOAT deltaTime) override;
 
 protected:
 	XMMATRIX mSpinBF;

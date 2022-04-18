@@ -14,10 +14,8 @@
 #include "Cube/BaseCube.h"
 #include "Cube/Cube.h"
 //#include "Cube/MyCube.h"
-//#include "Cube/OrbitCube.h"
+#include "Cube/OrbitCube.h"
 #include "Cube/CustomCube.h"
-
-
 #include "Game/Game.h"
 
 /*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -84,10 +82,23 @@ INT WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         return 0;
     }
 
+    std::shared_ptr<OrbitCube> orbitCube = std::make_shared<OrbitCube>("seafloor.dds");
+    game->GetRenderer()->AddRenderable(L"orbitCube", orbitCube);
+    if (FAILED(game->GetRenderer()->SetVertexShaderOfRenderable(L"orbitCube", L"MainShader")))
+    {
+        return 0;
+    }
+    if (FAILED(game->GetRenderer()->SetPixelShaderOfRenderable(L"orbitCube", L"MainShader")))
+    {
+        return 0;
+    }
+
     if (FAILED(game->Initialize(hInstance, nCmdShow)))
     {
         return 0;
     }
+
+    
 
     return game->Run();
 }

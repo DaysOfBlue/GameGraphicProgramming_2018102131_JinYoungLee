@@ -12,7 +12,7 @@ void CustomCube::Update(FLOAT deltaTime) {
 	static FLOAT s_totalTime = 0.0f;
 	s_totalTime += deltaTime;
 
-	m_world = XMMatrixTranslation(4.0f, XMScalarSin(s_totalTime), 0.0f) * XMMatrixRotationY(s_totalTime);
+	m_world = XMMatrixTranslation(4.0f, XMScalarSin(s_totalTime), 4.0f) * XMMatrixRotationZ(s_totalTime);
 
 }
 
