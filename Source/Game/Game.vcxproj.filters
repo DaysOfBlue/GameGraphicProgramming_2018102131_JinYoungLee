@@ -22,6 +22,12 @@
     <Filter Include="Source Files\Cube">
       <UniqueIdentifier>{81002b1e-a5e5-4bb8-a20a-37cf4fcf2947}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Light">
+      <UniqueIdentifier>{4c1527cc-aa2d-48a0-b20c-0937f32d2358}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Light">
+      <UniqueIdentifier>{9e9cfb42-0a5a-4fca-9682-dc2c5112b0a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -30,46 +36,32 @@
     <ClCompile Include="Cube\BaseCube.cpp">
       <Filter>Source Files\Cube</Filter>
     </ClCompile>
-    <ClCompile Include="Cube\MyCube.cpp">
-      <Filter>Source Files\Cube</Filter>
-    </ClCompile>
-    <ClCompile Include="Cube\OrbitCube.cpp">
-      <Filter>Source Files\Cube</Filter>
-    </ClCompile>
-    <ClCompile Include="Cube\CustomCube.cpp">
-      <Filter>Source Files\Cube</Filter>
-    </ClCompile>
     <ClCompile Include="Cube\Cube.cpp">
       <Filter>Source Files\Cube</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Shaders\PS.hlsl">
-      <Filter>Header Files\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\VS.hlsl">
-      <Filter>Header Files\Shaders</Filter>
-    </FxCompile>
+    <ClCompile Include="Cube\RotatingCube.cpp">
+      <Filter>Source Files\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="Light\RotatingPointLight.cpp">
+      <Filter>Source Files\Light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cube\BaseCube.h">
       <Filter>Header Files\Cube</Filter>
     </ClInclude>
-    <ClInclude Include="Cube\MyCube.h">
-      <Filter>Header Files\Cube</Filter>
-    </ClInclude>
-    <ClInclude Include="Cube\OrbitCube.h">
-      <Filter>Header Files\Cube</Filter>
-    </ClInclude>
-    <ClInclude Include="Cube\CustomCube.h">
-      <Filter>Header Files\Cube</Filter>
-    </ClInclude>
     <ClInclude Include="Cube\Cube.h">
       <Filter>Header Files\Cube</Filter>
     </ClInclude>
+    <ClInclude Include="Cube\RotatingCube.h">
+      <Filter>Header Files\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="Light\RotatingPointLight.h">
+      <Filter>Header Files\Light</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\Shaders.fxh">
+    <None Include="Shaders\PhongShaders.fxh">
       <Filter>Header Files\Shaders</Filter>
     </None>
   </ItemGroup>

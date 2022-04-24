@@ -8,6 +8,7 @@ OrbitCube::OrbitCube(const std::filesystem::path& textureFilePath) :
 	mOrbitBF(XMMatrixIdentity())
 {}
 
+
 void OrbitCube::Update(FLOAT deltaTime) {
 	XMMATRIX mTranslate = XMMatrixTranslation(-4.0f, 0.0f, 0.0f);
 	XMMATRIX mScale = XMMatrixScaling(0.3f, 0.3f, 0.3f);	

@@ -211,7 +211,7 @@ namespace library
     HRESULT Camera::Initialize(_In_ ID3D11Device* device)
     {
         D3D11_BUFFER_DESC cBufferDesc = {
-            .ByteWidth = sizeof(CBChangeOnResize),
+            .ByteWidth = sizeof(CBChangeOnCameraMovement),
             .Usage = D3D11_USAGE_DEFAULT,
             .BindFlags = D3D11_BIND_CONSTANT_BUFFER,
             .CPUAccessFlags = 0,
@@ -219,8 +219,11 @@ namespace library
             .StructureByteStride = 0
         };
 
+        XMFLOAT4 camPosition;
+        XMStoreFloat4(&camPosition, m_eye);
         CBChangeOnCameraMovement cbCameraMovement = {
-            .View = m_view
+            .View = m_view,
+            .CameraPosition = camPosition
         };
         
         D3D11_SUBRESOURCE_DATA cInitData = {

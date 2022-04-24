@@ -60,14 +60,9 @@ namespace library
         flags |= D3DCOMPILE_DEBUG;
 #endif
 
-        const D3D_SHADER_MACRO defines[] =
-        {
-            "EXAMPLE_DEFINE", "1",
-            NULL, NULL
-        };
-
+ 
         ComPtr<ID3DBlob> errorBlob;
-        HRESULT hr = D3DCompileFromFile(m_pszFileName, defines, D3D_COMPILE_STANDARD_FILE_INCLUDE,
+        HRESULT hr = D3DCompileFromFile(m_pszFileName, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
             m_pszEntryPoint, m_pszShaderModel,
             flags, 0, ppOutBlob, errorBlob.GetAddressOf());
         if (FAILED(hr))

@@ -21,6 +21,7 @@ C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 cbuffer cbChangeOnCameraMovement
 {
     matrix View;
+    float4 CameraPosition;
 };
 
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
@@ -40,6 +41,7 @@ C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 cbuffer cbChangesEveryFrame
 {
     matrix World;
+    float4 OutputColor;
 };
 
 

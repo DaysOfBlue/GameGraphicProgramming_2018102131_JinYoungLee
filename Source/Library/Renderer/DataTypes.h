@@ -11,6 +11,7 @@ namespace library
     {
         XMFLOAT3 Position;
         XMFLOAT2 TexCoord;
+        XMFLOAT3 Normal;
     };
 
     /*S+S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S
@@ -20,6 +21,7 @@ namespace library
     struct CBChangeOnCameraMovement
     {
         XMMATRIX View;
+        XMFLOAT4 CameraPosition;
     };
 
     /*S+S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S
@@ -29,6 +31,7 @@ namespace library
     struct CBChangeOnResize
     {
         XMMATRIX Projection;
+
     };
 
     /*S+S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S
@@ -38,5 +41,16 @@ namespace library
     struct CBChangesEveryFrame
     {
         XMMATRIX World;
+        XMFLOAT4 OutputColor;
+    };
+
+    /*S+S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S
+      Struct:   CBLights
+      Summary:  Constant buffer containing lights' information
+    S---S---S---S---S---S---S---S---S---S---S---S---S---S---S---S---S-S*/
+    struct CBLights
+    {
+        XMFLOAT4 LightPositions[NUM_LIGHTS];
+        XMFLOAT4 LightColors[NUM_LIGHTS];
     };
 }
