@@ -299,7 +299,7 @@ namespace library
             .SysMemSlicePitch = 0
         };
 
-        hr = m_d3dDevice->CreateBuffer(&cbLightsDesc, &cbLightsData, &m_cbLights);
+        hr = m_d3dDevice->CreateBuffer(&cbLightsDesc, &cbLightsData, m_cbLights.GetAddressOf());
         if (FAILED(hr)) return hr;
 
         m_immediateContext->VSSetConstantBuffers(3, 1, m_cbLights.GetAddressOf());

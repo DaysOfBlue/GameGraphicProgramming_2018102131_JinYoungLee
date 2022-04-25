@@ -118,7 +118,7 @@ namespace library
             .SysMemSlicePitch = 0
         };
 
-        hr = pDevice->CreateBuffer(&cBufferDesc, &cInitData, &m_constantBuffer);
+        hr = pDevice->CreateBuffer(&cBufferDesc, &cInitData, m_constantBuffer.GetAddressOf());
         if (FAILED(hr))
         {
             return hr;

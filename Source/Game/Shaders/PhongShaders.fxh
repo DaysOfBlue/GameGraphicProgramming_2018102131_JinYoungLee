@@ -109,8 +109,7 @@ PS_PHONG_INPUT VSPhong(VS_PHONG_INPUT input)
 PS_LIGHT_CUBE_INPUT VSLightCube(VS_PHONG_INPUT input)
 {
     PS_LIGHT_CUBE_INPUT output = (PS_LIGHT_CUBE_INPUT)0;
-    output.Position = input.Position;
-    output.Position = mul(output.Position, World);
+    output.Position = mul(input.Position, World);
     output.Position = mul(output.Position, View);
     output.Position = mul(output.Position, Projection);
 
