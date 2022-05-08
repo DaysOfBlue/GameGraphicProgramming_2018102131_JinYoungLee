@@ -52,6 +52,12 @@
     <Filter Include="Header Files\Texture">
       <UniqueIdentifier>{49c14801-600d-4488-a9f1-29d0239b3626}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Model">
+      <UniqueIdentifier>{704e79a7-eafc-4cbb-a137-9bc61fb28f5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Model">
+      <UniqueIdentifier>{e09a2b73-f81f-47c4-adc3-61874eeb56fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h">
@@ -93,8 +99,17 @@
     <ClInclude Include="Light\PointLight.h">
       <Filter>Header Files\Light</Filter>
     </ClInclude>
-    <ClInclude Include="Texture\DDSTextureLoader.h">
+    <ClInclude Include="Texture\Material.h">
       <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture\Texture.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture\WICTextureLoader.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Model.h">
+      <Filter>Header Files\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -125,8 +140,17 @@
     <ClCompile Include="Light\PointLight.cpp">
       <Filter>Source Files\Light</Filter>
     </ClCompile>
-    <ClCompile Include="Texture\DDSTextureLoader.cpp">
+    <ClCompile Include="Texture\Material.cpp">
       <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture\Texture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture\WICTextureLoader.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\Model.cpp">
+      <Filter>Source Files\Model</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

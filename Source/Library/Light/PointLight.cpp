@@ -43,9 +43,7 @@ namespace library
       Returns:  const XMFLOAT4&
                   Color of the light
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-    /*--------------------------------------------------------------------
-      TODO: PointLight::GetColor definition (remove the comment)
-    --------------------------------------------------------------------*/
+
     const XMFLOAT4& PointLight::GetColor() const
     {
         return m_color;

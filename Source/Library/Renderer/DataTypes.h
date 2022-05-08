@@ -1,5 +1,5 @@
 #pragma once
-
+#define NUM_LIGHTS 2
 namespace library
 {
     /*S+S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S
