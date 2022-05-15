@@ -64,5 +64,19 @@
     <None Include="Shaders\PhongShaders.fxh">
       <Filter>Header Files\Shaders</Filter>
     </None>
+    <None Include="Shaders\VoxelShaders.fxh">
+      <Filter>Header Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\Shaders.fxh">
+      <Filter>Header Files\Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\PS.hlsl">
+      <Filter>Header Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\VS.hlsl">
+      <Filter>Header Files\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
