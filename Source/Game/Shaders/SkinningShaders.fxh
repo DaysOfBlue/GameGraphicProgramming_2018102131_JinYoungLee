@@ -113,20 +113,11 @@ PS_PHONG_INPUT VSPhong(VS_INPUT input)
     output.Pos = mul(output.Pos, Projection);
     output.Tex = input.TexCoord;
     
-    float4x4 skinNoTranslation = skinTransform;
-    skinNoTranslation[0].w = 0;
-    skinNoTranslation[1].w = 0;
-    skinNoTranslation[2].w = 0;
-    skinNoTranslation[3].x = 0;
-    skinNoTranslation[3].y = 0;
-    skinNoTranslation[3].z = 0;
-    skinNoTranslation[3].w = 1;
+    
 
-    float4 normal = float4(input.Normal, 1);
-
-    normal = mul(normal, skinNoTranslation);
-    normal = mul(normal, World);
-    output.Norm = normalize(normal.xyz);
+    output.Norm = mul(float4(input.Normal, 0), skinTransform);
+    output.Norm = mul(float4(output.Norm,0), World);
+    output.Norm = normalize(output.Norm.xyz);
     output.WorldPos = mul(input.Position, skinTransform);
     output.WorldPos = mul(output.WorldPos, World);
 

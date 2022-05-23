@@ -702,10 +702,9 @@ namespace library
             m_immediateContext->UpdateSubresource(i.second->GetConstantBuffer().Get(), 0, nullptr, &cbChanges, 0, 0);
 
             CBSkinning cbSkinning = {};
-            auto& transforms = i.second->GetBoneTransforms();
-            for (UINT i = 0u; i < transforms.size(); i++)
+            for (UINT j = 0u; j < i.second->GetBoneTransforms().size(); j++)
             {
-                cbSkinning.BoneTransforms[i] = XMMatrixTranspose(transforms[i]);
+                cbSkinning.BoneTransforms[j] = XMMatrixTranspose(i.second->GetBoneTransforms()[j]);
             }
 
             m_immediateContext->UpdateSubresource(i.second->GetSkinningConstantBuffer().Get(),0,nullptr,&cbSkinning,0,0);
