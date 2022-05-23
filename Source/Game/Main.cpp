@@ -1,12 +1,9 @@
 ﻿/*+===================================================================
   File:      MAIN.CPP
-
   Summary:   This application demonstrates creating a Direct3D 11 device
-
   Origin:    http://msdn.microsoft.com/en-us/library/windows/apps/ff729718.aspx
-
   Originally created by Microsoft Corporation under MIT License
-  © 2022 Kyung Hee University
+  2022 Kyung Hee University
 ===================================================================+*/
 
 #include "Common.h"
@@ -16,19 +13,16 @@
 #include <memory>
 
 #include "Game/Game.h"
-#include "Cube\RotatingCube.h"
-#include "Cube\Cube.h"
-#include "Light\RotatingPointLight.h"
+#include "Light/RotatingPointLight.h"
+#include "Model/Model.h"
 #include "Scene/Voxel.h"
-
+#include "Shader/SkinningVertexShader.h"
 
 /*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   Function: wWinMain
-
   Summary:  Entry point to the program. Initializes everything and
             goes into a message processing loop. Idle time is used to
             render the scene.
-
   Args:     HINSTANCE hInstance
               Handle to an instance.
             HINSTANCE hPrevInstance
@@ -39,7 +33,6 @@
             INT nCmdShow
               Flag that says whether the main application window
               will be minimized, maximized, or shown normally
-
   Returns:  INT
               Status code.
 -----------------------------------------------------------------F-F*/
@@ -52,93 +45,81 @@ INT WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    std::unique_ptr<library::Game> game = std::make_unique<library::Game>(L"Game Graphics Programming Assignment 2: Voxel Map");
+    std::unique_ptr<library::Game> game = std::make_unique<library::Game>(L"Game Graphics Programming Lab 8: Skeletal Animation");
 
-    // Phong
+    std::shared_ptr<library::SkinningVertexShader> phongSkinningVertexShader = std::make_shared<library::SkinningVertexShader>(L"Shaders/SkinningShaders.fxh", "VSPhong", "vs_5_0");
+    if (FAILED(game->GetRenderer()->AddVertexShader(L"PhongSkinningShader", phongSkinningVertexShader)))
+    {
+        return 0;
+    }
+
     std::shared_ptr<library::VertexShader> phongVertexShader = std::make_shared<library::VertexShader>(L"Shaders/PhongShaders.fxh", "VSPhong", "vs_5_0");
     if (FAILED(game->GetRenderer()->AddVertexShader(L"PhongShader", phongVertexShader)))
     {
         return 0;
     }
-    // Light Cube
-    std::shared_ptr<library::VertexShader> lightVertexShader = std::make_shared<library::VertexShader>(L"Shaders/PhongShaders.fxh", "VSLightCube", "vs_5_0");
-    if (FAILED(game->GetRenderer()->AddVertexShader(L"LightShader", lightVertexShader)))
-    {
-        return 0;
-    }
-    // Voxel
+
     std::shared_ptr<library::VertexShader> voxelVertexShader = std::make_shared<library::VertexShader>(L"Shaders/VoxelShaders.fxh", "VSVoxel", "vs_5_0");
     if (FAILED(game->GetRenderer()->AddVertexShader(L"VoxelShader", voxelVertexShader)))
     {
         return 0;
     }
 
-    // Phong
+    std::shared_ptr<library::PixelShader> phongSkinningPixelShader = std::make_shared<library::PixelShader>(L"Shaders/SkinningShaders.fxh", "PSPhong", "ps_5_0");
+    if (FAILED(game->GetRenderer()->AddPixelShader(L"PhongSkinningShader", phongSkinningPixelShader)))
+    {
+        return 0;
+    }
+
     std::shared_ptr<library::PixelShader> phongPixelShader = std::make_shared<library::PixelShader>(L"Shaders/PhongShaders.fxh", "PSPhong", "ps_5_0");
     if (FAILED(game->GetRenderer()->AddPixelShader(L"PhongShader", phongPixelShader)))
     {
         return 0;
     }
-    // Light Cube
-    std::shared_ptr<library::PixelShader> lightPixelShader = std::make_shared<library::PixelShader>(L"Shaders/PhongShaders.fxh", "PSLightCube", "ps_5_0");
-    if (FAILED(game->GetRenderer()->AddPixelShader(L"LightShader", lightPixelShader)))
-    {
-        return 0;
-    }
-    // Voxel
+
     std::shared_ptr<library::PixelShader> voxelPixelShader = std::make_shared<library::PixelShader>(L"Shaders/VoxelShaders.fxh", "PSVoxel", "ps_5_0");
     if (FAILED(game->GetRenderer()->AddPixelShader(L"VoxelShader", voxelPixelShader)))
     {
         return 0;
     }
 
-    XMFLOAT4 color;
-    XMStoreFloat4(&color, Colors::White);
-    std::shared_ptr<library::PointLight> pointLight = std::make_shared<library::PointLight>(
-        XMFLOAT4(-5.77f, 5.77f, -5.77f, 1.0f),
-        color
-        );
-    if (FAILED(game->GetRenderer()->AddPointLight(0u, pointLight)))
+    std::shared_ptr<library::Model> warrior = std::make_shared<library::Model>(L"Content/BobLampClean/boblampclean.md5mesh");
+    warrior->RotateX(XM_PIDIV2);
+    warrior->Scale(0.1f, 0.1f, 0.1f);
+
+    if (FAILED(game->GetRenderer()->AddModel(L"Warrior", warrior)))
     {
         return 0;
     }
 
-    std::shared_ptr<Cube> lightCube = std::make_shared<Cube>(color);
-    lightCube->Translate(XMVectorSet(-5.77f, 5.77f, -5.77f, 0.0f));
-    if (FAILED(game->GetRenderer()->AddRenderable(L"LightCube", lightCube)))
+    if (FAILED(game->GetRenderer()->SetVertexShaderOfModel(L"Warrior", L"PhongSkinningShader")))
     {
         return 0;
     }
-    if (FAILED(game->GetRenderer()->SetVertexShaderOfRenderable(L"LightCube", L"LightShader")))
+
+    if (FAILED(game->GetRenderer()->SetPixelShaderOfModel(L"Warrior", L"PhongSkinningShader")))
     {
         return 0;
     }
-    if (FAILED(game->GetRenderer()->SetPixelShaderOfRenderable(L"LightCube", L"LightShader")))
+
+    XMFLOAT4 color;
+    XMStoreFloat4(&color, Colors::White);
+
+    std::shared_ptr<library::PointLight> directionalLight = std::make_shared<library::PointLight>(
+        XMFLOAT4(-5.77f, 5.77f, -5.77f, 1.0f),
+        color
+        );
+    if (FAILED(game->GetRenderer()->AddPointLight(0, directionalLight)))
     {
         return 0;
     }
 
     XMStoreFloat4(&color, Colors::Red);
-    std::shared_ptr<RotatingPointLight> rotatingPointLight = std::make_shared<RotatingPointLight>(
+    std::shared_ptr<RotatingPointLight> rotatingDirectionalLight = std::make_shared<RotatingPointLight>(
         XMFLOAT4(0.0f, 0.0f, -5.0f, 1.0f),
         color
         );
-    if (FAILED(game->GetRenderer()->AddPointLight(1u, rotatingPointLight)))
-    {
-        return 0;
-    }
-
-    std::shared_ptr<RotatingCube> rotatingLightCube = std::make_shared<RotatingCube>(color);
-    rotatingLightCube->Translate(XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f));
-    if (FAILED(game->GetRenderer()->AddRenderable(L"RotatingLightCube", rotatingLightCube)))
-    {
-        return 0;
-    }
-    if (FAILED(game->GetRenderer()->SetVertexShaderOfRenderable(L"RotatingLightCube", L"LightShader")))
-    {
-        return 0;
-    }
-    if (FAILED(game->GetRenderer()->SetPixelShaderOfRenderable(L"RotatingLightCube", L"LightShader")))
+    if (FAILED(game->GetRenderer()->AddPointLight(1, rotatingDirectionalLight)))
     {
         return 0;
     }
