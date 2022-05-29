@@ -8,8 +8,8 @@
 // Global Variables
 //--------------------------------------------------------------------------------------
 #define NUM_LIGHTS (2)
-Texture2D txDiffuse : register(t0);
-SamplerState samLinear : register(s0);
+Texture2D aTextures[2] : register(t0);
+SamplerState aSamplers[2] : register(s0);
 
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
@@ -45,6 +45,8 @@ cbuffer cbChangesEveryFrame : register(b2)
 {
     matrix World;
     float3 OutputColor;
+    bool HasNormalMap;
+
 };
 
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
@@ -67,10 +69,12 @@ cbuffer cbLights : register(b3)
 C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 struct VS_INPUT
 {
-    float4 Pos : POSITION;
-    float2 TexCoord : TEXCOORD;
+    float4 Position : POSITION;
+    float2 TexCoord : TEXCOORD0;
     float3 Normal : NORMAL;
-    row_major matrix Transform : INSTANCE_TRANSFORM;
+    float3 Tangent : TANGENT;
+    float3 Bitangent : BITANGENT;
+    row_major matrix mTransform : INSTANCE_TRANSFORM;
 
 };
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
@@ -82,9 +86,11 @@ C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 struct PS_INPUT
 {
     float4 Pos : SV_POSITION;
-    float2 Tex : TEXCOORD0;
-    float3 Normal : NORMAL;
-    float4 WorldPosition : WORLDPOS;
+    float2 Tex : TEXCOORD;
+    float3 Norm : NORMAL;
+    float4 WorldPos : POSITION;
+    float3 Tan : TANGENT;
+    float3 Bitan : BITANGENT;
 };
 //--------------------------------------------------------------------------------------
 // Vertex Shader
@@ -92,12 +98,21 @@ struct PS_INPUT
 PS_INPUT VSVoxel(VS_INPUT input)
 {
     PS_INPUT output = (PS_INPUT) 0;
-    output.Pos = mul(input.Pos, input.Transform);
+    output.Pos = mul(input.Position, input.mTransform);
     output.Pos = mul(output.Pos, World);
     output.Pos = mul(output.Pos, View);
     output.Pos = mul(output.Pos, Projection);
-    output.Normal = normalize(mul(float4(input.Normal, 0), World).xyz);
+    output.Norm = normalize(mul(float4(input.Normal, 0), World).xyz);
     output.Tex = input.TexCoord;
+    
+    output.WorldPos = mul(input.Position, input.mTransform);
+    output.WorldPos = mul(output.WorldPos, World);
+    
+    if (HasNormalMap)
+    {
+        output.Tan = normalize(mul(float4(input.Tangent, 0), World).xyz);
+        output.Bitan = normalize(mul(float4(input.Bitangent, 0), World).xyz);
+    }
     
     return output;
 }
@@ -107,18 +122,37 @@ PS_INPUT VSVoxel(VS_INPUT input)
 //--------------------------------------------------------------------------------------
 float4 PSVoxel(PS_INPUT input) : SV_Target
 {
+    float3 sample = aTextures[0].Sample(aSamplers[0], input.Tex);
+    float3 normal = normalize(input.Norm);
+    
+    if (HasNormalMap)
+    {
+        float4 bumpMap = aTextures[1].Sample(aSamplers[1], input.Tex);
         
+        bumpMap = (bumpMap * 2.0f) - 1.0f;
+        
+        float3 bumpNormal = bumpMap.x * input.Tan + bumpMap.y * input.Bitan + bumpMap.z * normal;
+        normal = normalize(bumpNormal);
+    }
+    
+    float3 toViewDir = normalize((CameraPosition - input.WorldPos).xyz);
+   
     float3 ambient = float3(0.1f, 0.1f, 0.1f);
     float3 diffuse = float3(0, 0, 0);
+    float3 specular = float3(0, 0, 0);
     
         
     for (uint i = 0; i < NUM_LIGHTS; ++i)
     {
-        float3 fromLightDir = normalize((input.WorldPosition - LightPositions[i]).xyz);
-    
-        diffuse += max(dot(input.Normal, -fromLightDir), 0) * LightColors[i].xyz;
+        float3 fromLightDir = normalize((input.WorldPos - LightPositions[i]).xyz);
+	
+        diffuse += max(dot(normal, -fromLightDir), 0) * LightColors[i].xyz;
+		
+        float3 refDir = reflect(fromLightDir, normal);
+        specular += pow(max(dot(refDir, toViewDir), 0), 20) * LightColors[i].xyz;
     }
 
-    return float4(saturate(ambient + diffuse) * OutputColor, 1);
-
+    return float4((ambient + diffuse + specular) * sample, 1);
+    
+    //return float4((normal + 1.0f) / 2.0f, 1.0f);
 }
