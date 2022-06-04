@@ -7,7 +7,7 @@
 //--------------------------------------------------------------------------------------
 // Global Variables
 //--------------------------------------------------------------------------------------
-#define NUM_LIGHTS (2)
+#define NUM_LIGHTS (1)
 Texture2D aTextures[2] : register(t0);
 SamplerState aSamplers[2] : register(s0);
 

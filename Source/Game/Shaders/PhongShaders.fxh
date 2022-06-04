@@ -4,8 +4,9 @@
 // Copyright (c) Kyung Hee University.
 //--------------------------------------------------------------------------------------
 
-#define NUM_LIGHTS (2)
-
+#define NUM_LIGHTS (1)
+#define NEAR_PLANE (0.01f)
+#define FAR_PLANE (1000.0f)
 //--------------------------------------------------------------------------------------
 // Global Variables
 //--------------------------------------------------------------------------------------
@@ -14,7 +15,8 @@
 --------------------------------------------------------------------*/
 Texture2D aTextures[2] : register( t0 );
 SamplerState aSamplers[2] : register( s0 );
-
+Texture2D shadowMapTexture : register(t2);
+SamplerState shadowMapSampler : register(s2);
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
 //--------------------------------------------------------------------------------------
@@ -52,10 +54,12 @@ cbuffer cbChangesEveryFrame : register( b2 )
   Cbuffer:  cbLights
   Summary:  Constant buffer used for shading
 C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
-cbuffer cbLights : register( b3 )
+cbuffer cbLights : register(b3)
 {
-	float4 LightPositions[NUM_LIGHTS];
-	float4 LightColors[NUM_LIGHTS];
+    float4 LightPositions[NUM_LIGHTS];
+    float4 LightColors[NUM_LIGHTS];
+    matrix LightViews[NUM_LIGHTS];
+    matrix LightProjections[NUM_LIGHTS];
 };
 
 //--------------------------------------------------------------------------------------
@@ -80,12 +84,13 @@ struct VS_PHONG_INPUT
 C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 struct PS_PHONG_INPUT
 {
-	float4 Pos : SV_POSITION;
-	float2 Tex : TEXCOORD;
-	float3 Norm : NORMAL;
-	float4 WorldPos : POSITION;
+    float4 Pos : SV_POSITION;
+    float2 Tex : TEXCOORD0;
+    float3 Norm : NORMAL;
+    float3 WorldPos : WORLDPOS;
     float3 Tangent : TANGENT;
     float3 Bitangent : BITANGENT;
+    float4 LightViewPosition : TEXCOORD1;
 };
 
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
@@ -122,6 +127,10 @@ PS_PHONG_INPUT VSPhong(VS_PHONG_INPUT input)
         output.Bitangent = normalize(mul(float4(input.Bitangent, 0), World).xyz);
     }
 
+    output.LightViewPosition = mul(input.Position, World);
+    output.LightViewPosition = mul(output.LightViewPosition, LightViews[0]);
+    output.LightViewPosition = mul(output.LightViewPosition, LightProjections[0]);
+    
     return output;
 }
 
@@ -136,12 +145,33 @@ PS_LIGHT_CUBE_INPUT VSLightCube(VS_PHONG_INPUT input)
 	return output;
 }
 
+float LinearizeDepth(float depth)
+{
+    float z = depth * 2.0 - 1.0;
+    return ((2.0 * NEAR_PLANE * FAR_PLANE) / (FAR_PLANE + NEAR_PLANE - z * (FAR_PLANE - NEAR_PLANE))) / FAR_PLANE;
+}
 
 //--------------------------------------------------------------------------------------
 // Pixel Shader
 //--------------------------------------------------------------------------------------
 float4 PSPhong(PS_PHONG_INPUT input) : SV_Target
 {
+    float4 color = aTextures[0].Sample(aSamplers[0], input.Tex);
+    float3 ambient = float3(0.1f, 0.1f, 0.1f) * color.rgb;
+    
+    float2 depthTexCoord;
+    depthTexCoord.x = input.LightViewPosition.x / input.LightViewPosition.w / 2.0f + 0.5f;
+    depthTexCoord.y = -input.LightViewPosition.y / input.LightViewPosition.w / 2.0f + 0.5f;
+    
+    float closestDepth = shadowMapTexture.Sample(shadowMapSampler, depthTexCoord).r;
+    float currentDepth = input.LightViewPosition.z / input.LightViewPosition.w;
+    
+    closestDepth = LinearizeDepth(closestDepth);
+    currentDepth = LinearizeDepth(currentDepth);
+    
+    if (currentDepth > closestDepth + 0.001f)
+        return float4(ambient, 1.0f);
+    
 	float3 toViewDir = normalize((CameraPosition - input.WorldPos).xyz);
 	float3 normal = normalize(input.Norm);
 	
@@ -155,7 +185,6 @@ float4 PSPhong(PS_PHONG_INPUT input) : SV_Target
         normal = normalize(bumpNormal);
     }
 	
-	float3 ambient = float3(0.1f, 0.1f, 0.1f);
 	float3 diffuse = float3(0, 0, 0);
 	float3 specular = float3(0, 0, 0);
 		

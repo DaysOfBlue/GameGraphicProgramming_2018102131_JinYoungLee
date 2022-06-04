@@ -1,13 +1,13 @@
-#include "Shader/SkinningVertexShader.h"
+#include "Shader/ShadowVertexShader.h"
 
 namespace library
 {
-    SkinningVertexShader::SkinningVertexShader(_In_ PCWSTR pszFileName, _In_ PCSTR pszEntryPoint, _In_ PCSTR pszShaderModel)
+    ShadowVertexShader::ShadowVertexShader(_In_ PCWSTR pszFileName, _In_ PCSTR pszEntryPoint, _In_ PCSTR pszShaderModel)
         : VertexShader(pszFileName, pszEntryPoint, pszShaderModel)
     {
     }
 
-    HRESULT SkinningVertexShader::Initialize(_In_ ID3D11Device* pDevice)
+    HRESULT ShadowVertexShader::Initialize(_In_ ID3D11Device* pDevice)
     {
         ComPtr<ID3DBlob> vsBlob;
         HRESULT hr = compile(vsBlob.GetAddressOf());
@@ -38,16 +38,19 @@ namespace library
         D3D11_INPUT_ELEMENT_DESC aLayouts[] =
         {
             { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-
-            { "BONEINDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 3, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "BONEWEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 3, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+            { "INSTANCE_TRANSFORM", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+            { "INSTANCE_TRANSFORM", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+            { "INSTANCE_TRANSFORM", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+            { "INSTANCE_TRANSFORM", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
         };
         UINT uNumElements = ARRAYSIZE(aLayouts);
 
         // Create the input layout
         hr = pDevice->CreateInputLayout(aLayouts, uNumElements, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), m_vertexLayout.GetAddressOf());
+        if (FAILED(hr))
+        {
+            return hr;
+        }
 
         return hr;
     }
