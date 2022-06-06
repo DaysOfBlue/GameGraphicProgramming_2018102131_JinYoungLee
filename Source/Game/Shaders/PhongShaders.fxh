@@ -15,8 +15,20 @@
 --------------------------------------------------------------------*/
 Texture2D aTextures[2] : register( t0 );
 SamplerState aSamplers[2] : register( s0 );
+
 Texture2D shadowMapTexture : register(t2);
 SamplerState shadowMapSampler : register(s2);
+
+
+struct pointLight
+{
+    float4 Position;
+    float4 Color;
+    float4 AttenuationDistance;
+    matrix View;
+    matrix Projection;
+
+};
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
 //--------------------------------------------------------------------------------------
@@ -56,10 +68,7 @@ cbuffer cbChangesEveryFrame : register( b2 )
 C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 cbuffer cbLights : register(b3)
 {
-    float4 LightPositions[NUM_LIGHTS];
-    float4 LightColors[NUM_LIGHTS];
-    matrix LightViews[NUM_LIGHTS];
-    matrix LightProjections[NUM_LIGHTS];
+    pointLight PointLights[NUM_LIGHTS];
 };
 
 //--------------------------------------------------------------------------------------
@@ -103,6 +112,8 @@ struct PS_LIGHT_CUBE_INPUT
 	float4 Position : SV_POSITION;
 };
 
+
+
 //--------------------------------------------------------------------------------------
 // Vertex Shader
 //--------------------------------------------------------------------------------------
@@ -127,9 +138,10 @@ PS_PHONG_INPUT VSPhong(VS_PHONG_INPUT input)
         output.Bitangent = normalize(mul(float4(input.Bitangent, 0), World).xyz);
     }
 
+    
     output.LightViewPosition = mul(input.Position, World);
-    output.LightViewPosition = mul(output.LightViewPosition, LightViews[0]);
-    output.LightViewPosition = mul(output.LightViewPosition, LightProjections[0]);
+    output.LightViewPosition = mul(output.LightViewPosition, PointLights[0].View);
+    output.LightViewPosition = mul(output.LightViewPosition, PointLights[0].Projection);
     
     return output;
 }
@@ -144,6 +156,9 @@ PS_LIGHT_CUBE_INPUT VSLightCube(VS_PHONG_INPUT input)
 
 	return output;
 }
+
+
+
 
 float LinearizeDepth(float depth)
 {
@@ -172,9 +187,9 @@ float4 PSPhong(PS_PHONG_INPUT input) : SV_Target
     if (currentDepth > closestDepth + 0.001f)
         return float4(ambient, 1.0f);
     
-	float3 toViewDir = normalize((CameraPosition - input.WorldPos).xyz);
+	float3 toViewDir = normalize((CameraPosition.xyz - input.WorldPos));
 	float3 normal = normalize(input.Norm);
-	
+    
     if (HasNormalMap)
     {
         float4 bumpMap = aTextures[1].Sample(aSamplers[1], input.Tex);
@@ -187,15 +202,27 @@ float4 PSPhong(PS_PHONG_INPUT input) : SV_Target
 	
 	float3 diffuse = float3(0, 0, 0);
 	float3 specular = float3(0, 0, 0);
+    
 		
 	for (uint i = 0; i < NUM_LIGHTS; ++i)
 	{
-		float3 fromLightDir = normalize((input.WorldPos - LightPositions[i]).xyz);
-	
-		diffuse += max(dot(normal, -fromLightDir), 0) * LightColors[i].xyz;
+        float3 fromLightDir = normalize((input.WorldPos - PointLights[i].Position.xyz));
+        
+        
+        
+        float eps = 0.000001;
+        float r = dot( input.WorldPos - PointLights[i].Position.xyz, input.WorldPos - PointLights[i].Position.xyz);
+       
+        float intensity = PointLights[i].AttenuationDistance.z / (r + eps);
+
+        diffuse += max(dot(normal, -fromLightDir), 0) * PointLights[i].Color.xyz * intensity;
+        
 		
 		float3 refDir = reflect(fromLightDir, normal);
-		specular += pow(max(dot(refDir, toViewDir), 0), 20) * LightColors[i].xyz;
+        specular += pow(max(dot(refDir, toViewDir), 0), 20) * PointLights[i].Color.xyz * intensity;
+        
+        ambient = ambient * intensity;
+
     }
 
     return float4(ambient + diffuse + specular, 1) * aTextures[0].Sample(aSamplers[0], input.Tex);

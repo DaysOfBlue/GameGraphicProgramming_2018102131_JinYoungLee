@@ -22,9 +22,6 @@
     <Filter Include="Header Files\Renderer">
       <UniqueIdentifier>{ee482e3f-0ef9-4014-863a-1d51cafd051c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Window">
-      <UniqueIdentifier>{ea05dbcc-8fef-4442-9dfd-caa2614691b7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Renderer">
       <UniqueIdentifier>{f22d8568-31ee-4cdf-8bd0-d7c077611f35}</UniqueIdentifier>
     </Filter>
@@ -63,6 +60,9 @@
     </Filter>
     <Filter Include="Source Files\Scene">
       <UniqueIdentifier>{4c6572a1-2657-4fb2-93e7-9117bba5dab2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Window">
+      <UniqueIdentifier>{ea05dbcc-8fef-4442-9dfd-caa2614691b7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -135,6 +135,15 @@
     <ClInclude Include="Shader\ShadowVertexShader.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer\Skybox.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\SkyMapVertexShader.h">
+      <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture\DDSTextureLoader.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game\Game.cpp">
@@ -193,6 +202,15 @@
     </ClCompile>
     <ClCompile Include="Shader\ShadowVertexShader.cpp">
       <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Skybox.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\SkyMapVertexShader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture\DDSTextureLoader.cpp">
+      <Filter>Source Files\Texture</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

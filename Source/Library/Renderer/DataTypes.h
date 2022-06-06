@@ -20,6 +20,8 @@ namespace library
         XMFLOAT3 Normal;
     };
 
+
+
     /*S+S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S+++S
       Struct:   InstanceData
 
@@ -93,12 +95,19 @@ namespace library
 
       Summary:  Constant buffer containing lights' information
     S---S---S---S---S---S---S---S---S---S---S---S---S---S---S---S---S-S*/
+
+    struct CBPointLight
+    {
+        XMFLOAT4 Position;
+        XMFLOAT4 Color;
+        XMFLOAT4 AttenuationDistance;
+        XMMATRIX View;
+        XMMATRIX Projection;
+    };
+
     struct CBLights
     {
-        XMFLOAT4 LightPositions[NUM_LIGHTS];
-        XMFLOAT4 LightColors[NUM_LIGHTS];
-        XMMATRIX LightViews[NUM_LIGHTS];
-        XMMATRIX LightProjections[NUM_LIGHTS];
+        CBPointLight PointLights[NUM_LIGHTS];
 
     };
 
@@ -109,5 +118,5 @@ namespace library
         XMMATRIX Projection;
         BOOL IsVoxel;
     };
-    
+
 }

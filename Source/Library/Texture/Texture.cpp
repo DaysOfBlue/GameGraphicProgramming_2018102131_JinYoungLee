@@ -1,9 +1,11 @@
 #include "Texture.h"
-
+#include "Texture/DDSTextureLoader.h"
 #include "Texture/WICTextureLoader.h"
 
 namespace library
 {
+    ComPtr<ID3D11SamplerState> Texture::s_samplers[static_cast<size_t>(eTextureSamplerType::COUNT)];
+
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Texture::Texture
 
@@ -14,10 +16,10 @@ namespace library
 
       Modifies: [m_filePath, m_textureRV, m_samplerLinear].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-    Texture::Texture(_In_ const std::filesystem::path& filePath) :
+    Texture::Texture(_In_ const std::filesystem::path& filePath, _In_opt_ eTextureSamplerType textureSamplerType) :
         m_filePath(filePath),
         m_textureRV(),
-        m_samplerLinear()
+        m_textureSamplerType(textureSamplerType)
     {}
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
@@ -31,33 +33,64 @@ namespace library
                   The Direct3D context to set buffers
 
       Modifies: [m_textureRV, m_samplerLinear].
-    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/ 
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
     HRESULT Texture::Initialize(_In_ ID3D11Device* pDevice, _In_ ID3D11DeviceContext* pImmediateContext) {
         HRESULT hr = CreateWICTextureFromFile(pDevice, pImmediateContext, m_filePath.c_str(), nullptr, m_textureRV.GetAddressOf());
         if (FAILED(hr))
         {
-            return hr;
+            hr = CreateDDSTextureFromFile(pDevice, m_filePath.c_str(), nullptr, m_textureRV.GetAddressOf());
+            if (FAILED(hr))
+            {
+                OutputDebugString(L"Can't load texture from \"");
+                OutputDebugString(m_filePath.c_str());
+                OutputDebugString(L"\n");
+                return hr;
+            }
         }
 
-        D3D11_SAMPLER_DESC sampDesc = {
-            .Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR,
-            .AddressU = D3D11_TEXTURE_ADDRESS_WRAP,
-            .AddressV = D3D11_TEXTURE_ADDRESS_WRAP,
-            .AddressW = D3D11_TEXTURE_ADDRESS_WRAP,
-            .ComparisonFunc = D3D11_COMPARISON_NEVER,
-            .MinLOD = 0,
-            .MaxLOD = D3D11_FLOAT32_MAX
-        };
-
-        hr = pDevice->CreateSamplerState(&sampDesc, m_samplerLinear.GetAddressOf());
-        if (FAILED(hr))
+        // Create the sample state
+        if (!s_samplers[static_cast<size_t>(eTextureSamplerType::TRILINEAR_WRAP)].Get())
         {
-            return hr;
+            D3D11_SAMPLER_DESC sampDesc =
+            {
+                .Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR,
+                .AddressU = D3D11_TEXTURE_ADDRESS_WRAP,
+                .AddressV = D3D11_TEXTURE_ADDRESS_WRAP,
+                .AddressW = D3D11_TEXTURE_ADDRESS_WRAP,
+                .MinLOD = 0,
+                .MaxLOD = D3D11_FLOAT32_MAX
+            };
+            hr = pDevice->CreateSamplerState(&sampDesc, s_samplers[static_cast<size_t>(eTextureSamplerType::TRILINEAR_WRAP)].GetAddressOf());
+            if (FAILED(hr))
+            {
+                return hr;
+            }
         }
-    }
-    
 
-    
+        if (!s_samplers[static_cast<size_t>(eTextureSamplerType::TRILINEAR_CLAMP)].Get())
+        {
+            D3D11_SAMPLER_DESC sampDesc =
+            {
+                .Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR,
+                .AddressU = D3D11_TEXTURE_ADDRESS_CLAMP,
+                .AddressV = D3D11_TEXTURE_ADDRESS_CLAMP,
+                .AddressW = D3D11_TEXTURE_ADDRESS_CLAMP,
+                .MinLOD = 0,
+                .MaxLOD = D3D11_FLOAT32_MAX
+            };
+            hr = pDevice->CreateSamplerState(&sampDesc, s_samplers[static_cast<size_t>(eTextureSamplerType::TRILINEAR_CLAMP)].GetAddressOf());
+            if (FAILED(hr))
+            {
+                return hr;
+            }
+        }
+
+        return hr;
+
+    }
+
+
+
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Texture::GetTextureResourceView
 
@@ -72,15 +105,15 @@ namespace library
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-      Method:   Texture::GetSamplerState
+        Method:   Texture::GetSamplerType
 
-      Summary:  Constructor
+        Summary:  Returns the sampler type
 
-      Returns:  ComPtr<ID3D11SamplerState>&
-                  Sampler state
-    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-    ComPtr<ID3D11SamplerState>& Texture::GetSamplerState()
+        Returns:  eTextureSamplerType
+                    Sampler type
+      M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    eTextureSamplerType Texture::GetSamplerType() const
     {
-        return m_samplerLinear;
+        return m_textureSamplerType;
     }
 }

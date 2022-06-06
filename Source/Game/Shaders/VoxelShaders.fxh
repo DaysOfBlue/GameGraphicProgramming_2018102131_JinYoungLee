@@ -11,6 +11,14 @@
 Texture2D aTextures[2] : register(t0);
 SamplerState aSamplers[2] : register(s0);
 
+struct pointLight
+{
+    float4 Position;
+    float4 Color;
+    float4 AttenuationDistance;
+
+};
+
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
 //--------------------------------------------------------------------------------------
@@ -56,8 +64,9 @@ cbuffer cbChangesEveryFrame : register(b2)
 C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 cbuffer cbLights : register(b3)
 {
-    float4 LightPositions[NUM_LIGHTS];
-    float4 LightColors[NUM_LIGHTS];
+    //float4 LightPositions[NUM_LIGHTS];
+    //float4 LightColors[NUM_LIGHTS];
+    pointLight PointLights[NUM_LIGHTS];
 };
 
 //--------------------------------------------------------------------------------------
@@ -144,12 +153,12 @@ float4 PSVoxel(PS_INPUT input) : SV_Target
         
     for (uint i = 0; i < NUM_LIGHTS; ++i)
     {
-        float3 fromLightDir = normalize((input.WorldPos - LightPositions[i]).xyz);
+        float3 fromLightDir = normalize((input.WorldPos - PointLights[i].Position).xyz);
 	
-        diffuse += max(dot(normal, -fromLightDir), 0) * LightColors[i].xyz;
+        diffuse += max(dot(normal, -fromLightDir), 0) * PointLights[i].Color.xyz;
 		
         float3 refDir = reflect(fromLightDir, normal);
-        specular += pow(max(dot(refDir, toViewDir), 0), 20) * LightColors[i].xyz;
+        specular += pow(max(dot(refDir, toViewDir), 0), 20) * PointLights[i].Color.xyz;
     }
 
     return float4((ambient + diffuse + specular) * sample, 1);

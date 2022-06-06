@@ -31,6 +31,7 @@ namespace library
         , m_vertexShaders()
         , m_pixelShaders()
         , m_materials()
+        , m_skyBox()
     {
         std::ifstream inputFile;
         inputFile.open(m_filePath.string());
@@ -204,12 +205,26 @@ namespace library
             for (int i = 0; i < it->second->GetNumMaterials(); ++i)
             {
                 AddMaterial(it->second->GetMaterial(i));
+                if (FAILED(hr)) 
+                {
+                    return hr;
+                }
             }
+
         }
 
         for (auto it = m_materials.begin(); it != m_materials.end(); ++it)
         {
             HRESULT hr = it->second->Initialize(pDevice, pImmediateContext);
+            if (FAILED(hr))
+            {
+                return hr;
+            }
+        }
+
+        if (m_skyBox)
+        {
+            HRESULT hr = m_skyBox->Initialize(pDevice, pImmediateContext);
             if (FAILED(hr))
             {
                 return hr;
@@ -348,6 +363,33 @@ namespace library
         return S_OK;
     }
 
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Scene::AddSkyBox
+
+      Summary:  Add the skybox
+
+      Args:     const std::shared_ptr<Skybox>&
+                  Skybox to use
+
+      Modifies: [m_skyBox].
+
+      Returns:  HRESULT
+                  Status code
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    
+    HRESULT Scene::AddSkyBox(_In_ const std::shared_ptr<Skybox>& skybox)
+    {
+        if (!skybox)
+        {
+            return E_INVALIDARG;
+        }
+        else {
+            m_skyBox = skybox;
+        }
+
+        return S_OK;
+    }
+
     HRESULT Scene::AddMaterial(_In_ const std::shared_ptr<Material>& material)
     {
         if (m_materials.contains(material->GetName()))
@@ -368,6 +410,9 @@ namespace library
       Args:     FLOAT deltaTime
                   Time difference of a frame
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    /*--------------------------------------------------------------------
+      TODO: Scene::Update definition (remove the comment)
+    --------------------------------------------------------------------*/
     void Scene::Update(_In_ FLOAT deltaTime)
     {
         for (auto it = m_renderables.begin(); it != m_renderables.end(); ++it)
@@ -384,6 +429,11 @@ namespace library
         {
             m_aPointLights[lightIdx]->Update(deltaTime);
         }
+
+        if (m_skyBox) {
+            m_skyBox->Update(deltaTime);
+        }
+        
     }
 
     std::vector<std::shared_ptr<Voxel>>& Scene::GetVoxels()
@@ -421,6 +471,20 @@ namespace library
     std::unordered_map<std::wstring, std::shared_ptr<Material>>& Scene::GetMaterials()
     {
         return m_materials;
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Scene::GetSkyBox
+
+      Summary:  Returns a sky box
+
+      Returns:  std::shared_ptr<Skybox>&
+                  Sky box
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+    
+    std::shared_ptr<Skybox>& Scene::GetSkyBox()
+    {
+        return m_skyBox;
     }
 
     const std::filesystem::path& Scene::GetFilePath() const
